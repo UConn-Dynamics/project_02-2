@@ -1,11 +1,14 @@
 ### A Pluto.jl notebook ###
-# v0.20.24
+# v0.20.23
+
+#> [frontmatter]
+#> title = "project 2_rev3_written_in"
 
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 0d9be664-d7c5-4084-add2-25e5418742d6
-using LinearAlgebra, Plots, DSP
+# ╔═╡ 91f15f2c-7b4e-4f5f-8d45-9ebef77ce7dc
+using LinearAlgebra, Plots
 
 # ╔═╡ f17103ea-06bf-11f1-a2b0-79e68ed152eb
 md"""# Project_02 - Multibody kinematic modeling
@@ -30,7 +33,7 @@ In this project, you need to
 3. visualize the motion of the system as the rigid bar goes through at least one full rotation
 """
 
-# ╔═╡ a010e288-da99-4dea-abc3-f025d4c0c5a2
+# ╔═╡ b79f52a8-8c00-4b70-9fc5-164b7735e70d
 md"""# 1. Determine the Constraint equations C(q,t)
 
 
@@ -108,7 +111,7 @@ Lsin{\theta}_{3}
 """
 
 
-# ╔═╡ 6f35bfe3-819d-4ad0-b1be-c789a8330fd1
+# ╔═╡ 279da94d-6a6a-4884-bc51-09a7c90edafe
 md"""
 
 **Vector from Piston 1 to Piston 2:**
@@ -164,7 +167,30 @@ $s_2=\frac{L}{2\sqrt{2}}(sin{\theta}_{3}-cos{\theta}_{3})$
 
 """ 
 
-# ╔═╡ 6731bfb8-747b-48ac-987a-e7d953a8996e
+# ╔═╡ a31c2198-98d0-4e79-ba9b-74487a3fd967
+md"""# 2. Solve for Velocities $\dot{q}$ and accelerations $\ddot{q}$
+
+**Velocity:**
+
+Differentiating the constraint equation with respect to time gives ->
+
+$C(\dot{q},t)=2{s}_{1}\dot{s_1}+2{s}_{2}\dot{s_2}=0$
+$C(\dot{q},t)={s}_{1}\dot{s_1}+{s}_{2}\dot{s_2}=0$
+$C(\dot{q},t)=(-\frac{L}{2\sqrt{2}}(cos{\theta}_{3}+sin{\theta}_{3}))\dot{s_1}+(\frac{L}{2\sqrt{2}}(sin{\theta}_{3}-cos{\theta}_{3}))\dot{s_2}=0$
+
+
+s_1:
+
+$\dot{s_1}=\frac{L}{\sqrt{2}}(sin{\theta}_{3}-cos{\theta}_{3})$
+
+s_2:
+
+$\dot{s_2}=\frac{L}{\sqrt{2}}(cos{\theta}_{3}+sin{\theta}_{3})$
+
+"""
+
+
+# ╔═╡ 891f182c-18f8-401d-a984-b1b3de2e67b0
 md"""
 
 **Acceleration:**
@@ -186,7 +212,8 @@ $\ddot{s_2}=\frac{2L}{\sqrt{2}}(-sin{\theta}_{3}+cos{\theta}_{3})$
 
 """
 
-# ╔═╡ 0a113cff-5b18-480b-8eb0-f4ab376bb7ec
+
+# ╔═╡ ea9a70e5-5790-4c11-97ae-690e6d9eb516
 # -------------------------
 # Parameters
 # -------------------------
@@ -199,23 +226,23 @@ begin
 	α2 = 3*π/4                  # example: 45 deg (shift in angle accounted for later)
 end
 
-# ╔═╡ 8699f823-8c7a-4164-ba98-6e4639178415
+# ╔═╡ fbe15d42-7162-4218-88e1-018ed677b3f0
 # Time
 tspan = range(0, 4π/ω3, length=300)   # one full rotation
 
-# ╔═╡ cd6ee079-67f3-4fc5-9e0a-537b51c1ab84
+# ╔═╡ bcb494f9-a3df-46a7-9348-e2eac204e190
 md"""
 ${\theta}_{3}(t)={\theta}_{3}+{\omega}_{3}t$
 """
 
 
-# ╔═╡ 0a643f4a-8d52-48d1-b074-5fda48856e2a
+# ╔═╡ b8e47bce-4ec8-4bf1-b64b-817e597a65b2
 # -------------------------
 # Functions
 # -------------------------
 θ3(t) = θ30 + ω3*t
 
-# ╔═╡ dc9301f4-9649-4a3e-a07b-ebde8b7e58c9
+# ╔═╡ 2cddd741-e951-432e-9c5c-8853488d3c6d
 md"""
 Position Inputs (Assumes ${\alpha}_{1}$ & ${\alpha_2}$ are equivalent):
 
@@ -233,7 +260,7 @@ Lsin({\theta_3})
 $s=A,~b$
 """
 
-# ╔═╡ 9c42c0fb-2abe-4052-aaa1-3e5df024a133
+# ╔═╡ 588c45c6-4633-4e7f-9534-57709602170f
 function solve_positions(t, α1, α2, L)
     θ = θ3(t)
 
@@ -251,7 +278,7 @@ function solve_positions(t, α1, α2, L)
     return s[1], s[2]
 end
 
-# ╔═╡ e3398989-b8c2-4296-8ba0-f1634cd7ab13
+# ╔═╡ f09f7a94-7d0c-4485-ba10-be8f65eb456d
 md"""
 Velocity Inputs:
 
@@ -269,7 +296,8 @@ L{\omega}_{3}^2cos({\theta_3})
 $\dot{s}=A,~b$
 """
 
-# ╔═╡ 508098b3-9e91-445a-b4ce-f7fe36fd5fbf
+
+# ╔═╡ f3004cb6-61b9-4eda-9472-8b313377577d
 function solve_velocities(t, α1, α2, L, ω3)
     θ = θ3(t)
 
@@ -287,7 +315,7 @@ function solve_velocities(t, α1, α2, L, ω3)
     return sdot[1], sdot[2]
 end
 
-# ╔═╡ 8ac307b3-9e51-4df9-8424-43a1af0aacde
+# ╔═╡ b3151f63-6c9f-4bf9-ae4c-9fa89d6bc1c0
 md"""
 Acceleration Inputs:
 
@@ -306,7 +334,8 @@ $\ddot{s}=A,~b$
 
 """
 
-# ╔═╡ 54ff3beb-24d7-4ff0-a85a-ed2c743a6b8f
+
+# ╔═╡ a9ad74bb-1d7a-486c-a65c-295aaad37750
 function solve_accelerations(t, α1, α2, L, ω3)
     θ = θ3(t)
 
@@ -324,40 +353,78 @@ function solve_accelerations(t, α1, α2, L, ω3)
     return sddot[1], sddot[2]
 end
 
-# ╔═╡ bee3a562-a49b-4aba-9803-9db872eace93
-function center_position(t, L)
-    θ = θ3(t)
-    x = (L/2)*cos(θ)
-    y = (L/2)*sin(θ)
-    return x, y
+# ╔═╡ 735b0c96-cdb9-450e-a89d-1c76f2b15560
+begin
+    #Conditioning / singularity check for the 2×2 solve A*s = b
+    # A depends only on the track angles α1 and α2 (constants in this project).
+    A = [
+        -cos(α1)   cos(α2)
+        -sin(α1)   sin(α2)
+    ]
+
+    condA = cond(A)
+
+    # Thresholds (rule of thumb)
+    cond_warn = 100.0
+    cond_bad  = 1000.0
+
+    md"Conditioning check: cond(A) = $(round(condA, digits=3))  (warn > $(cond_warn), bad > $(cond_bad))"
 end
 
-# ╔═╡ f86b407e-633b-42fd-b223-5800f5f4be3b
+# ╔═╡ 6c4c1d6c-05c9-4eba-ad6b-57d74b94f1c3
+begin
+    # Plot cond(A) as a constant line across the simulation time span
+    condA_vals = fill(condA, length(tspan))
+
+    p = plot(
+        tspan, condA_vals,
+        xlabel="Time (s)",
+        ylabel="cond(A)",
+        title="Condition Number of Solve Matrix A",
+        legend=false,
+        lw=2
+    )
+
+    hline!(p, [cond_warn], linestyle=:dash, lw=2)
+    hline!(p, [cond_bad], linestyle=:dashdot, lw=2)
+
+    p
+end
+
+# ╔═╡ 1f6e208c-e8bd-4974-9973-51b7d1a571f3
+md"""
+### Conditioning check
+
+The 2×2 solve (A*s = b) is well-conditioned with cond(A) = 1.0, so the kinematics are far from singular and numerically stable.
+"""
+
+
+# ╔═╡ b1bd29d2-aabe-490d-8e58-1854f2de485f
 # -------------------------
 # Compute results
 # -------------------------
 s1_vals = Float64[]
 
-# ╔═╡ db65d773-8474-449d-b98a-fb9471abde94
+# ╔═╡ 0a8aec35-ae14-491c-9926-becdad7bbf46
 s2_vals = Float64[]
 
-# ╔═╡ ca205c22-6494-4129-91df-429ec9db5822
+# ╔═╡ f4f50ebf-b7cc-4d13-be8f-90ea731502d5
 s1dot_vals = Float64[]
 
-# ╔═╡ d3bdfa29-dbf0-4a42-8fe2-50f3c8c8a272
+# ╔═╡ bcb7995f-2061-495b-8f1f-b134d5222c04
 s2dot_vals = Float64[]
 
-# ╔═╡ 61267ef5-1b40-46cf-9328-8f8a48a8ddf3
+# ╔═╡ 66646852-6945-4a81-98aa-9ca3cd5b54dd
 s1ddot_vals = Float64[]
 
-# ╔═╡ 7e7aca92-1fb9-438d-9efb-cb68409d58cb
+# ╔═╡ d25d2756-1f09-46f4-80b3-96389c4eca6c
 s2ddot_vals = Float64[]
 
-# ╔═╡ 5d32aa96-a070-49a1-9b0a-958e5f0f184d
+# ╔═╡ 1d0dcfeb-c2cc-4d09-88db-d6e9e430d7cc
 md"""# 3. Visualize the Motion of the System as a Rigid Bar Goes through at least one Full Rotation
 """
 
-# ╔═╡ 264b734e-3ce0-489d-affe-831df4e79ede
+# ╔═╡ a6889fc8-bbac-473a-9abf-1276db8eb901
 for t in tspan
     s1, s2 = solve_positions(t, α1, α2, L)
     s1dot, s2dot = solve_velocities(t, α1, α2, L, ω3)
@@ -371,12 +438,50 @@ for t in tspan
     push!(s2ddot_vals, s2ddot)
 end
 
-# ╔═╡ 97440e40-878d-4f3c-9a33-f90b67412c51
+# ╔═╡ 2c48c51f-97ba-4c5c-aeed-afd29f735e65
 md"""
 	## Piston Kinematics As A Function of S1 and S2
 	"""
 
-# ╔═╡ 0bf74255-638c-4687-b3d9-5d97bcc9ae37
+# ╔═╡ 753ef8f1-c7e6-4728-ba19-69b852f108bb
+plot(
+    tspan,
+    [s1_vals s2_vals],
+    xlabel = "Time (s)",
+    ylabel = "Position along track (m)",
+    label = ["Piston 1" "Piston 2"],
+    linewidth = 2,
+    title = "Piston Positions vs Time"
+)
+
+# ╔═╡ c31c4349-193d-46d8-a0f9-e3e414e9409d
+plot(
+    tspan,
+    [s1dot_vals s2dot_vals],
+    xlabel = "Time (s)",
+    ylabel = "Velocity along track (m/s)",
+    label = ["s1_dot(t)" "s2_dot(t)"],
+    linewidth = 2,
+    title = "Piston Velocities vs Time"
+)
+
+# ╔═╡ eb01dc5a-77ee-412d-9468-1157ef8d4d36
+plot(
+    tspan,
+    [s1ddot_vals s2ddot_vals],
+    xlabel = "Time (s)",
+    ylabel = "Acceleration along track (m/s^2)",
+    label = ["s1_ddot(t)" "s2_ddot(t)"],
+    linewidth = 2,
+    title = "Piston Accelerations vs Time"
+)
+
+# ╔═╡ e44beb54-0152-47c5-ac2c-050eff89646c
+md"""
+	## Piston Kinematics In Global Coordinate System
+	"""
+
+# ╔═╡ bf6e093d-d926-4512-b2b0-ee67e8e7959b
 begin
 	function piston1_xy(s1)
 	    return s1*cos(α1), s1*sin(α1)
@@ -386,7 +491,7 @@ begin
 	end
 end
 
-# ╔═╡ d2f2eb0a-f8d4-4383-8801-4fc9ff849fa2
+# ╔═╡ 6996a516-67aa-4297-b0f1-0580e064886a
 begin
 	function piston1_v_xy(s1dot)
 	    return s1dot*cos(α1), s1dot*sin(α1)
@@ -396,7 +501,7 @@ begin
 	end
 end
 
-# ╔═╡ 79acd4d0-d881-4408-b058-bd148bb71b69
+# ╔═╡ 16d56fb2-b4ba-4bb2-9d9f-04910d339a41
 begin
 	function piston1_a_xy(s1ddot)
 	    return s1ddot*cos(α1), s1ddot*sin(α1)
@@ -406,104 +511,175 @@ begin
 	end
 end
 
-# ╔═╡ ce39830b-65ae-4b5f-8054-8be07bfab3bb
+# ╔═╡ 8c91c608-e929-45c9-9f45-5c9e89de1317
 xp11,xp12 = piston1_xy(s1_vals)
 
-# ╔═╡ 8300cc77-9364-4479-ae68-83260cf63a27
+# ╔═╡ 7c745e4b-8263-4e1f-969e-9e1d64ef3278
 xp21,xp22 = piston2_xy(s2_vals)
 
-# ╔═╡ 3e7f1bb4-fdc0-443d-9429-ee6146163674
+# ╔═╡ 863f1020-cbc9-41eb-b251-54ba20a8c718
 begin
 	xv11,xv12 = piston1_v_xy(s1dot_vals)
 	xv21,xv22 = piston2_v_xy(s2dot_vals)
 end
 
-# ╔═╡ 841c728b-9967-4c59-915d-9550bca9a94c
+# ╔═╡ ba0416bb-c88d-461b-a204-528476a7743b
 begin
 	xa11,xa12 = piston1_a_xy(s1ddot_vals)
 	xa21,xa22 = piston2_a_xy(s2ddot_vals)
 end
 
-# ╔═╡ 1ea516fd-843b-4618-a978-de873747d4be
+# ╔═╡ ad5a72a9-f54f-43d8-887f-60384e0eb72f
+#Animation of the position of Piston 1 in the overall global coordinate system
 begin
-    anim = @animate for k in eachindex(tspan)
-
-        # X position 
-        p1 = plot(
-            tspan, xp11,
-            xlabel="Time [s]", ylabel="Position X [m]",
-            title="Position X",
-            lw=2, color=:steelblue, label="Piston 1"
-        )
-        plot!(p1, tspan, xp21, lw=2, color=:crimson, label="Piston 2")
-        scatter!(p1, [tspan[k]], [xp11[k]], color=:steelblue, ms=5, label="")
-        scatter!(p1, [tspan[k]], [xp21[k]], color=:crimson, ms=5, label="")
-		
-        # Y position
-        p2 = plot(
-            tspan, xp12,
-            xlabel="Time [s]", ylabel="Position Y [m]",
-            title="Position Y",
-            lw=2, color=:steelblue, label="Piston 1"
-        )
-        plot!(p2, tspan, xp22, lw=2, color=:crimson, label="Piston 2")
-        scatter!(p2, [tspan[k]], [xp12[k]], color=:steelblue, ms=5, label="")
-        scatter!(p2, [tspan[k]], [xp22[k]], color=:crimson, ms=5, label="")
-
-        # X velocity
-      
-        p3 = plot(
-            tspan, xv11,
-            xlabel="Time [s]", ylabel="Velocity X [m/s]",
-            title="Velocity X",
-            lw=2, color=:steelblue, label="Piston 1"
-        )
-        plot!(p3, tspan, xv21, lw=2, color=:crimson, label="Piston 2")
-        scatter!(p3, [tspan[k]], [xv11[k]], color=:steelblue, ms=5, label="")
-        scatter!(p3, [tspan[k]], [xv21[k]], color=:crimson, ms=5, label="")
-
-        # Y velocity
-        p4 = plot(
-            tspan, xv12,
-            xlabel="Time [s]", ylabel="Velocity Y [m/s]",
-            title="Velocity Y",
-            lw=2, color=:steelblue, label="Piston 1"
-        )
-        plot!(p4, tspan, xv22, lw=2, color=:crimson, label="Piston 2")
-        scatter!(p4, [tspan[k]], [xv12[k]], color=:steelblue, ms=5, label="")
-        scatter!(p4, [tspan[k]], [xv22[k]], color=:crimson, ms=5, label="")
-
-        # X acceleration
-        p5 = plot(
-            tspan, xa11,
-            xlabel="Time [s]", ylabel="Accel X [m/s²]",
-            title="Acceleration X",
-            lw=2, color=:steelblue, label="Piston 1"
-        )
-        plot!(p5, tspan, xa21, lw=2, color=:crimson, label="Piston 2")
-        scatter!(p5, [tspan[k]], [xa11[k]], color=:steelblue, ms=5, label="")
-        scatter!(p5, [tspan[k]], [xa21[k]], color=:crimson, ms=5, label="")
-
-        # Y acceleration
-        p6 = plot(
-            tspan, xa12,
-            xlabel="Time [s]", ylabel="Accel Y [m/s²]",
-            title="Acceleration Y",
-            lw=2, color=:steelblue, label="Piston 1"
-        )
-        plot!(p6, tspan, xa22, lw=2, color=:crimson, label="Piston 2")
-        scatter!(p6, [tspan[k]], [xa12[k]], color=:steelblue, ms=5, label="")
-        scatter!(p6, [tspan[k]], [xa22[k]], color=:crimson, ms=5, label="")
-
-		
-        plot(p1, p2, p3, p4, p5, p6; layout=(2,3), size=(1200,800))
-
-    end
-
-    gif(anim, "piston_kinematics_full.gif"; fps=45)
+	displace_p1 = @animate for k in eachindex(tspan)
+	    plot(
+	        tspan,
+	        [xp11, xp12];
+	        xlabel = "Time (s)",
+	        ylabel = "Position along track (m)",
+	        label = ["X" "Y"],
+	        linewidth = 2,
+	        title = "Piston 1 Position vs Time"
+	    )
+	
+	    scatter!([tspan[k]], [xp11[k]];
+	             c=:dodgerblue, ms=6, label="")
+	    scatter!([tspan[k]], [xp12[k]];
+	             c=:tomato, ms=6, label="")
+	end
+	
+	gif(displace_p1, "piston1_position_trace.gif"; fps=45)
+	
 end
 
-# ╔═╡ 589d1455-63a4-4b78-967b-7e10583f80e6
+# ╔═╡ c5c20310-9f64-438d-a246-2f0f06fafe92
+#Animation of the position of Piston 2 in the overall global coordinate system
+begin
+	displace_p2 = @animate for k in eachindex(tspan)
+	    plot(
+	        tspan,
+	        [xp21, xp22];
+	        xlabel = "Time (s)",
+	        ylabel = "Position along track (m)",
+	        label = ["X" "Y"],
+	        linewidth = 2,
+	        title = "Piston 2 Position vs Time"
+	    )
+	
+	    scatter!([tspan[k]], [xp21[k]];
+	             c=:dodgerblue, ms=6, label="")
+	    scatter!([tspan[k]], [xp22[k]];
+	             c=:tomato, ms=6, label="")
+	end
+	
+	gif(displace_p2, "piston1_position_trace.gif"; fps=45)
+	
+end
+
+# ╔═╡ a5b189a8-a5c7-4a69-a4a6-53fb256b1f76
+md"""
+## Piston Velocity
+"""
+
+# ╔═╡ 4c938496-9204-4c15-8ffe-e6a8242f430b
+begin
+	velocity_p1 = @animate for k in eachindex(tspan)
+	   plot(
+		 tspan,
+	 	[xv11, xv12];
+	 	xlabel = "Time (s)",
+	 	ylabel = "Velocity (m/s)",
+	 	label = ["Xdot" "Ydot"],
+	 	linewidth = 2,
+	 	title = "Piston 1 Velocity vs Time"
+ 	)
+	
+	    scatter!([tspan[k]], [xv11[k]];
+	             c=:dodgerblue, ms=6, label="")
+	    scatter!([tspan[k]], [xv12[k]];
+	             c=:tomato, ms=6, label="")
+	end
+	
+	gif(velocity_p1, "piston1_velocity_trace.gif"; fps=45)
+	
+end
+
+# ╔═╡ 6eba0cea-c34d-4905-b05b-55e8290ab6a7
+begin
+	velocity_p2 = @animate for k in eachindex(tspan)
+	   plot(
+		 tspan,
+	 	[xv21, xv22];
+	 	xlabel = "Time (s)",
+	 	ylabel = "Velocity (m/s)",
+	 	label = ["Xdot" "Ydot"],
+	 	linewidth = 2,
+	 	title = "Piston 2 Velocity vs Time"
+ 	)
+	
+	    scatter!([tspan[k]], [xv21[k]];
+	             c=:dodgerblue, ms=6, label="")
+	    scatter!([tspan[k]], [xv22[k]];
+	             c=:tomato, ms=6, label="")
+	end
+	
+	gif(velocity_p2, "piston2_velocity_trace.gif"; fps=45)
+	
+end
+
+# ╔═╡ 10ed4dbe-5873-4091-9239-9b4c353e8783
+md"""
+## Acceleration
+"""
+
+# ╔═╡ 9dcb799e-91e2-41f3-bb90-f5c0ee48add6
+begin
+	accel_p1 = @animate for k in eachindex(tspan)
+	   plot(
+	 tspan,
+	 [xa11, xa12];
+	 xlabel = "Time (s)",
+	 ylabel = "Acceleration (m/s^2)",
+	 label = ["Xddot" "Yddot"],
+	 linewidth = 2,
+	 title = "Piston 1 Acceleration vs Time"
+ 	)
+	
+	    scatter!([tspan[k]], [xa11[k]];
+	             c=:dodgerblue, ms=6, label="")
+	    scatter!([tspan[k]], [xa12[k]];
+	             c=:tomato, ms=6, label="")
+	end
+	
+	gif(accel_p1, "piston1_accel_trace.gif"; fps=45)
+	
+end
+
+# ╔═╡ 5711b475-6cf5-4c28-b4fe-87c40a92a881
+begin
+	accel_p2 = @animate for k in eachindex(tspan)
+	   plot(
+	 tspan,
+	 [xa21, xa22];
+	 xlabel = "Time (s)",
+	 ylabel = "Acceleration (m/s^2)",
+	 label = ["Xddot" "Yddot"],
+	 linewidth = 2,
+	 title = "Piston 2 Acceleration vs Time"
+ 	)
+	
+	    scatter!([tspan[k]], [xa21[k]];
+	             c=:dodgerblue, ms=6, label="")
+	    scatter!([tspan[k]], [xa22[k]];
+	             c=:tomato, ms=6, label="")
+	end
+	
+	gif(accel_p2, "piston2_accel_trace.gif"; fps=45)
+	
+end
+
+# ╔═╡ c307baa6-eb57-4be8-b529-57be29344c9d
 begin
 	 figure_p1_x = plot(
 		 tspan,
@@ -524,7 +700,11 @@ begin
 		 linewidth = 2,
 		 title = "Piston 1 Y"
 	 )
+	plot(figure_p1_x,figure_p1_y, plot_title = "Piston 1 Kinematics")
+end
 
+# ╔═╡ 6e34c8c0-1b01-4425-b3bc-a52e94efb977
+begin
 	 figure_p2_x = plot(
 		 tspan,
 		 [xp21, xv21, xa21];
@@ -544,56 +724,20 @@ begin
 		 linewidth = 2,
 		 title = "Piston 2 Y"
 	 )
-
-
-	
-	plot(figure_p1_x,figure_p1_y,figure_p2_x,figure_p2_y, layout=(2,2),size=(1100,1000) ,plot_title = "Piston Kinematics")
+	plot(figure_p2_x,figure_p2_y, plot_title = "Piston 2 Kinematics")
 end
 
-# ╔═╡ 92fcf5ba-3f39-4c26-8b33-3572c4c830d0
-begin
-    Center_posx = similar(tspan)
-    Center_posy = similar(tspan)
-
-    for (i, t) in enumerate(tspan)
-        Center_posx[i], Center_posy[i] = center_position(t, L)
-    end
-end
-
-# ╔═╡ 5a12aa30-ba1e-4c20-a05b-ab7656c76db6
-begin
-    # --- Bar Center X ---
-    p1 = plot(
-        tspan, Center_posx,
-        xlabel="Time [s]", ylabel="X Position [m]",
-        title="Bar Center X",
-        lw=2, color=:steelblue, label="r3x"
-    )
-
-    # --- Bar Center Y ---
-    p2 = plot(
-        tspan, Center_posy,
-        xlabel="Time [s]", ylabel="Y Position [m]",
-        title="Bar Center Y",
-        lw=2, color=:crimson, label="r3y"
-    )
-
-    # --- Final 2×2 Layout ---
-    plot(p1, p2; layout=(1,2), size=(1200,400))
-end
-
-
-# ╔═╡ 0827b15c-65cb-4384-87c2-1bb382322ba4
+# ╔═╡ 586cd0be-3bca-4338-a451-429cd6268414
 md"""# System Rotation Animation Code"""
 
-# ╔═╡ a87d8261-f761-409c-947e-c0fe625a44ac
+# ╔═╡ a354eb0a-91ea-4cbe-8bfb-6e0338d987eb
 #Defines Channel Directions for Plots
 begin
 	channel1_direction = (cos(α1), sin(α1))
 	channel2_direction = (cos(α2), sin(α2))  # crossed channels
 end
 
-# ╔═╡ 40795eed-4136-47a7-a417-753273ecc696
+# ╔═╡ edef31e2-ed59-4c67-a2fd-7ed2fe27834c
 begin
 	#Generates the Block Visual
 	function rectangle_shape(cx, cy, dx, dy; length=0.04, width=0.02)
@@ -616,13 +760,13 @@ begin
 	end
 end
 
-# ╔═╡ 25f65845-f8d7-4773-b367-db724ad73ae2
+# ╔═╡ 17c657dc-a2ad-4741-b75a-9b5f00526401
 begin
 	channel1 = slot_shape(0.0, 0.0, channel1_direction...; half_length=0.14)
 	channel2 = slot_shape(0.0, 0.0, channel2_direction...; half_length=0.14)
 end
 
-# ╔═╡ 0a7ba191-5082-4da9-a68b-18e8ce5f5025
+# ╔═╡ 67941a28-6362-4735-a97a-c6484326c13d
 begin
 	time_s = tspan
 	x1 = xp11; y1 = xp12
@@ -631,7 +775,7 @@ begin
 	x_min = -0.15; x_max = 0.15
 	y_min = -0.15; y_max = 0.15
 	
-	anim2 = @animate for k in eachindex(x1)
+	anim = @animate for k in eachindex(x1)
 	    plot(; xlim=(x_min, x_max), ylim=(y_min, y_max), aspect_ratio=:equal,
 	         legend=false, title="Mechanism motion  θ̇₃ = 2 rad/s  t=$(round(time_s[k], digits=3)) s")
 	
@@ -640,14 +784,17 @@ begin
 	    scatter!([x2[k]], [y2[k]]; ms=8)                             # piston 2
 	end
 	
-	gif(anim2, "mechanism.gif"; fps=60)
+	gif(anim, "mechanism.gif"; fps=60)
 	``
 end
 
-# ╔═╡ b1534361-3853-4da1-b041-52b8211ccc52
+# ╔═╡ 3464bcbe-9588-4fc1-aa50-5e11d0d01051
 dt = tspan[2]-tspan[1]
 
-# ╔═╡ bca32499-dab5-4bba-82a7-c35d25ce2102
+# ╔═╡ 4e1db290-43a8-4552-99f2-e44a1f7f2186
+gif(anim, "mechanism.gif", fps=1/dt)
+
+# ╔═╡ dde15418-4f60-47cb-853b-c048422ceb08
 begin
 	anim3 = @animate for k in eachindex(x1)
 	    plot(; aspect_ratio=:equal, legend=:topright,
@@ -676,13 +823,11 @@ end
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [compat]
-DSP = "~0.8.4"
-Plots = "~1.41.6"
+Plots = "~1.41.4"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -691,21 +836,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.12.5"
 manifest_format = "2.0"
-project_hash = "54e2a78c127c92041270cd38aa0d252a1df70863"
-
-[[deps.AbstractFFTs]]
-deps = ["LinearAlgebra"]
-git-tree-sha1 = "d92ad398961a3ed262d8bf04a1a2b8340f915fef"
-uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
-version = "1.5.0"
-
-    [deps.AbstractFFTs.extensions]
-    AbstractFFTsChainRulesCoreExt = "ChainRulesCore"
-    AbstractFFTsTestExt = "Test"
-
-    [deps.AbstractFFTs.weakdeps]
-    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-    Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+project_hash = "1767cefe1e3f3a0c2359842695780e9f15740bc6"
 
 [[deps.AliasTables]]
 deps = ["PtrArrays", "Random"]
@@ -724,11 +855,6 @@ version = "1.11.0"
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 version = "1.11.0"
-
-[[deps.Bessels]]
-git-tree-sha1 = "4435559dc39793d53a9e3d278e185e920b4619ef"
-uuid = "0e736298-9ec6-45e8-9647-e4fc86a2fe38"
-version = "0.2.8"
 
 [[deps.BitFlags]]
 git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"
@@ -774,10 +900,12 @@ deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "Requires", "Statist
 git-tree-sha1 = "8b3b6f87ce8f65a2b4f857528fd8d70086cd72b1"
 uuid = "c3611d14-8923-5661-9e6a-0046d554d3a4"
 version = "0.11.0"
-weakdeps = ["SpecialFunctions"]
 
     [deps.ColorVectorSpace.extensions]
     SpecialFunctionsExt = "SpecialFunctions"
+
+    [deps.ColorVectorSpace.weakdeps]
+    SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [[deps.Colors]]
 deps = ["ColorTypes", "FixedPointNumbers", "Reexport"]
@@ -796,37 +924,10 @@ git-tree-sha1 = "21d088c496ea22914fe80906eb5bce65755e5ec8"
 uuid = "f0e56b4a-5159-44fe-b623-3e5288b988bb"
 version = "2.5.1"
 
-[[deps.ConstructionBase]]
-git-tree-sha1 = "b4b092499347b18a015186eae3042f72267106cb"
-uuid = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
-version = "1.6.0"
-
-    [deps.ConstructionBase.extensions]
-    ConstructionBaseIntervalSetsExt = "IntervalSets"
-    ConstructionBaseLinearAlgebraExt = "LinearAlgebra"
-    ConstructionBaseStaticArraysExt = "StaticArrays"
-
-    [deps.ConstructionBase.weakdeps]
-    IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
-    LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
-
 [[deps.Contour]]
 git-tree-sha1 = "439e35b0b36e2e5881738abc8857bd92ad6ff9a8"
 uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
 version = "0.6.3"
-
-[[deps.DSP]]
-deps = ["Bessels", "FFTW", "IterTools", "LinearAlgebra", "Polynomials", "Random", "Reexport", "SpecialFunctions", "Statistics"]
-git-tree-sha1 = "5989debfc3b38f736e69724818210c67ffee4352"
-uuid = "717857b8-e6f2-59f4-9121-6e50c889abd2"
-version = "0.8.4"
-
-    [deps.DSP.extensions]
-    OffsetArraysExt = "OffsetArrays"
-
-    [deps.DSP.weakdeps]
-    OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
 
 [[deps.DataAPI]]
 git-tree-sha1 = "abe83f3a2f1b857aac70ef8b269080af17764bbe"
@@ -896,18 +997,6 @@ git-tree-sha1 = "01ba9d15e9eae375dc1eb9589df76b3572acd3f2"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
 version = "8.0.1+0"
 
-[[deps.FFTW]]
-deps = ["AbstractFFTs", "FFTW_jll", "Libdl", "LinearAlgebra", "MKL_jll", "Preferences", "Reexport"]
-git-tree-sha1 = "97f08406df914023af55ade2f843c39e99c5d969"
-uuid = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
-version = "1.10.0"
-
-[[deps.FFTW_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "6d6219a004b8cf1e0b4dbe27a2860b8e04eba0be"
-uuid = "f5851436-0d7a-5f13-b9de-f02708fd171a"
-version = "3.3.11+0"
-
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 version = "1.11.0"
@@ -940,11 +1029,6 @@ deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "7a214fdac5ed5f59a22c2d9a885a16da1c74bbc7"
 uuid = "559328eb-81f9-559d-9380-de523a88c83c"
 version = "1.0.17+0"
-
-[[deps.Future]]
-deps = ["Random"]
-uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
-version = "1.11.0"
 
 [[deps.GLFW_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll", "libdecor_jll", "xkbcommon_jll"]
@@ -1001,21 +1085,15 @@ version = "1.0.2"
 
 [[deps.HTTP]]
 deps = ["Base64", "CodecZlib", "ConcurrentUtilities", "Dates", "ExceptionUnwrapping", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "PrecompileTools", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
-git-tree-sha1 = "51059d23c8bb67911a2e6fd5130229113735fc7e"
+git-tree-sha1 = "5e6fe50ae7f23d171f44e311c2960294aaa0beb5"
 uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
-version = "1.11.0"
+version = "1.10.19"
 
 [[deps.HarfBuzz_jll]]
 deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "Graphite2_jll", "JLLWrappers", "Libdl", "Libffi_jll"]
 git-tree-sha1 = "f923f9a774fcf3f5cb761bfa43aeadd689714813"
 uuid = "2e76f6c2-a576-52d4-95c1-20adfe4de566"
 version = "8.5.1+0"
-
-[[deps.IntelOpenMP_jll]]
-deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl"]
-git-tree-sha1 = "ec1debd61c300961f98064cfb21287613ad7f303"
-uuid = "1d5cc7b8-4909-519e-a0f8-d0f5ad9712d0"
-version = "2025.2.0+0"
 
 [[deps.InteractiveUtils]]
 deps = ["Markdown"]
@@ -1026,11 +1104,6 @@ version = "1.11.0"
 git-tree-sha1 = "b2d91fe939cae05960e760110b328288867b5758"
 uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
 version = "0.2.6"
-
-[[deps.IterTools]]
-git-tree-sha1 = "42d5f897009e7ff2cf88db414a389e5ed1bdd023"
-uuid = "c8e1da08-722c-5040-9ed9-7db0dc04731e"
-version = "1.10.0"
 
 [[deps.JLFzf]]
 deps = ["REPL", "Random", "fzf_jll"]
@@ -1113,11 +1186,6 @@ version = "0.16.10"
     SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
     SymEngine = "123dc426-2d89-5057-bbad-38513e3affd8"
     tectonic_jll = "d7dd28d6-a5e6-559c-9131-7eb760cdacc5"
-
-[[deps.LazyArtifacts]]
-deps = ["Artifacts", "Pkg"]
-uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
-version = "1.11.0"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -1215,12 +1283,6 @@ git-tree-sha1 = "f00544d95982ea270145636c181ceda21c4e2575"
 uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
 version = "1.2.0"
 
-[[deps.MKL_jll]]
-deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "oneTBB_jll"]
-git-tree-sha1 = "282cadc186e7b2ae0eeadbd7a4dffed4196ae2aa"
-uuid = "856f044c-d86e-5d09-b602-aeab76dc8ba7"
-version = "2025.2.0+0"
-
 [[deps.MacroTools]]
 git-tree-sha1 = "1e0228a030642014fe5cfe68c2c0a818f9e3f522"
 uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
@@ -1299,12 +1361,6 @@ deps = ["Artifacts", "Libdl"]
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
 version = "3.5.4+0"
 
-[[deps.OpenSpecFun_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "1346c9208249809840c91b26703912dff463d335"
-uuid = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
-version = "0.5.6+0"
-
 [[deps.Opus_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "e2bb57a313a74b8104064b7efd01406c0a50d2ff"
@@ -1379,26 +1435,6 @@ version = "1.41.6"
     IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
     ImageInTerminal = "d8c32880-2388-543b-8c61-d9f865259254"
     Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
-
-[[deps.Polynomials]]
-deps = ["LinearAlgebra", "OrderedCollections", "Setfield", "SparseArrays"]
-git-tree-sha1 = "2d99b4c8a7845ab1342921733fa29366dae28b24"
-uuid = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
-version = "4.1.1"
-
-    [deps.Polynomials.extensions]
-    PolynomialsChainRulesCoreExt = "ChainRulesCore"
-    PolynomialsFFTWExt = "FFTW"
-    PolynomialsMakieExt = "Makie"
-    PolynomialsMutableArithmeticsExt = "MutableArithmetics"
-    PolynomialsRecipesBaseExt = "RecipesBase"
-
-    [deps.Polynomials.weakdeps]
-    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-    FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
-    Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
-    MutableArithmetics = "d8a4904e-b15c-11e9-3269-09a3773c0cb0"
-    RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 
 [[deps.PrecompileTools]]
 deps = ["Preferences"]
@@ -1505,12 +1541,6 @@ version = "1.3.0"
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 version = "1.11.0"
 
-[[deps.Setfield]]
-deps = ["ConstructionBase", "Future", "MacroTools", "StaticArraysCore"]
-git-tree-sha1 = "c5391c6ace3bc430ca630251d02ea9687169ca68"
-uuid = "efcf1570-3423-57d1-acb7-fd33fddbac46"
-version = "1.1.2"
-
 [[deps.Showoff]]
 deps = ["Dates", "Grisu"]
 git-tree-sha1 = "91eddf657aca81df9ae6ceb20b959ae5653ad1de"
@@ -1537,28 +1567,11 @@ deps = ["Libdl", "LinearAlgebra", "Random", "Serialization", "SuiteSparse_jll"]
 uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 version = "1.12.0"
 
-[[deps.SpecialFunctions]]
-deps = ["IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
-git-tree-sha1 = "2700b235561b0335d5bef7097a111dc513b8655e"
-uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
-version = "2.7.2"
-
-    [deps.SpecialFunctions.extensions]
-    SpecialFunctionsChainRulesCoreExt = "ChainRulesCore"
-
-    [deps.SpecialFunctions.weakdeps]
-    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-
 [[deps.StableRNGs]]
 deps = ["Random"]
 git-tree-sha1 = "4f96c596b8c8258cc7d3b19797854d368f243ddc"
 uuid = "860ef19b-820b-49d6-a774-d7a799459cd3"
 version = "1.0.4"
-
-[[deps.StaticArraysCore]]
-git-tree-sha1 = "6ab403037779dae8c514bad259f32a447262455a"
-uuid = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
-version = "1.4.4"
 
 [[deps.Statistics]]
 deps = ["LinearAlgebra"]
@@ -1917,12 +1930,6 @@ deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
 version = "1.64.0+1"
 
-[[deps.oneTBB_jll]]
-deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl"]
-git-tree-sha1 = "1350188a69a6e46f799d3945beef36435ed7262f"
-uuid = "1317d2d5-d96f-522e-a858-c73665f53c3e"
-version = "2022.0.0+1"
-
 [[deps.p7zip_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
@@ -1949,47 +1956,61 @@ version = "1.13.0+0"
 
 # ╔═╡ Cell order:
 # ╟─f17103ea-06bf-11f1-a2b0-79e68ed152eb
-# ╠═0d9be664-d7c5-4084-add2-25e5418742d6
-# ╟─a010e288-da99-4dea-abc3-f025d4c0c5a2
-# ╟─6f35bfe3-819d-4ad0-b1be-c789a8330fd1
-# ╟─6731bfb8-747b-48ac-987a-e7d953a8996e
-# ╠═0a113cff-5b18-480b-8eb0-f4ab376bb7ec
-# ╠═8699f823-8c7a-4164-ba98-6e4639178415
-# ╟─cd6ee079-67f3-4fc5-9e0a-537b51c1ab84
-# ╠═0a643f4a-8d52-48d1-b074-5fda48856e2a
-# ╟─dc9301f4-9649-4a3e-a07b-ebde8b7e58c9
-# ╠═9c42c0fb-2abe-4052-aaa1-3e5df024a133
-# ╟─e3398989-b8c2-4296-8ba0-f1634cd7ab13
-# ╠═508098b3-9e91-445a-b4ce-f7fe36fd5fbf
-# ╠═8ac307b3-9e51-4df9-8424-43a1af0aacde
-# ╠═54ff3beb-24d7-4ff0-a85a-ed2c743a6b8f
-# ╠═bee3a562-a49b-4aba-9803-9db872eace93
-# ╠═f86b407e-633b-42fd-b223-5800f5f4be3b
-# ╠═db65d773-8474-449d-b98a-fb9471abde94
-# ╠═ca205c22-6494-4129-91df-429ec9db5822
-# ╠═d3bdfa29-dbf0-4a42-8fe2-50f3c8c8a272
-# ╠═61267ef5-1b40-46cf-9328-8f8a48a8ddf3
-# ╠═7e7aca92-1fb9-438d-9efb-cb68409d58cb
-# ╟─5d32aa96-a070-49a1-9b0a-958e5f0f184d
-# ╠═264b734e-3ce0-489d-affe-831df4e79ede
-# ╟─97440e40-878d-4f3c-9a33-f90b67412c51
-# ╠═0bf74255-638c-4687-b3d9-5d97bcc9ae37
-# ╠═d2f2eb0a-f8d4-4383-8801-4fc9ff849fa2
-# ╠═79acd4d0-d881-4408-b058-bd148bb71b69
-# ╠═ce39830b-65ae-4b5f-8054-8be07bfab3bb
-# ╠═8300cc77-9364-4479-ae68-83260cf63a27
-# ╠═3e7f1bb4-fdc0-443d-9429-ee6146163674
-# ╠═841c728b-9967-4c59-915d-9550bca9a94c
-# ╠═1ea516fd-843b-4618-a978-de873747d4be
-# ╠═589d1455-63a4-4b78-967b-7e10583f80e6
-# ╠═92fcf5ba-3f39-4c26-8b33-3572c4c830d0
-# ╠═5a12aa30-ba1e-4c20-a05b-ab7656c76db6
-# ╟─0827b15c-65cb-4384-87c2-1bb382322ba4
-# ╠═a87d8261-f761-409c-947e-c0fe625a44ac
-# ╠═40795eed-4136-47a7-a417-753273ecc696
-# ╠═25f65845-f8d7-4773-b367-db724ad73ae2
-# ╠═0a7ba191-5082-4da9-a68b-18e8ce5f5025
-# ╠═b1534361-3853-4da1-b041-52b8211ccc52
-# ╠═bca32499-dab5-4bba-82a7-c35d25ce2102
+# ╠═91f15f2c-7b4e-4f5f-8d45-9ebef77ce7dc
+# ╟─b79f52a8-8c00-4b70-9fc5-164b7735e70d
+# ╟─279da94d-6a6a-4884-bc51-09a7c90edafe
+# ╟─a31c2198-98d0-4e79-ba9b-74487a3fd967
+# ╟─891f182c-18f8-401d-a984-b1b3de2e67b0
+# ╠═ea9a70e5-5790-4c11-97ae-690e6d9eb516
+# ╠═fbe15d42-7162-4218-88e1-018ed677b3f0
+# ╟─bcb494f9-a3df-46a7-9348-e2eac204e190
+# ╠═b8e47bce-4ec8-4bf1-b64b-817e597a65b2
+# ╟─2cddd741-e951-432e-9c5c-8853488d3c6d
+# ╠═588c45c6-4633-4e7f-9534-57709602170f
+# ╟─f09f7a94-7d0c-4485-ba10-be8f65eb456d
+# ╠═f3004cb6-61b9-4eda-9472-8b313377577d
+# ╟─b3151f63-6c9f-4bf9-ae4c-9fa89d6bc1c0
+# ╠═a9ad74bb-1d7a-486c-a65c-295aaad37750
+# ╠═735b0c96-cdb9-450e-a89d-1c76f2b15560
+# ╠═6c4c1d6c-05c9-4eba-ad6b-57d74b94f1c3
+# ╠═1f6e208c-e8bd-4974-9973-51b7d1a571f3
+# ╠═b1bd29d2-aabe-490d-8e58-1854f2de485f
+# ╠═0a8aec35-ae14-491c-9926-becdad7bbf46
+# ╠═f4f50ebf-b7cc-4d13-be8f-90ea731502d5
+# ╠═bcb7995f-2061-495b-8f1f-b134d5222c04
+# ╠═66646852-6945-4a81-98aa-9ca3cd5b54dd
+# ╠═d25d2756-1f09-46f4-80b3-96389c4eca6c
+# ╟─1d0dcfeb-c2cc-4d09-88db-d6e9e430d7cc
+# ╠═a6889fc8-bbac-473a-9abf-1276db8eb901
+# ╟─2c48c51f-97ba-4c5c-aeed-afd29f735e65
+# ╠═753ef8f1-c7e6-4728-ba19-69b852f108bb
+# ╠═c31c4349-193d-46d8-a0f9-e3e414e9409d
+# ╠═eb01dc5a-77ee-412d-9468-1157ef8d4d36
+# ╟─e44beb54-0152-47c5-ac2c-050eff89646c
+# ╠═bf6e093d-d926-4512-b2b0-ee67e8e7959b
+# ╠═6996a516-67aa-4297-b0f1-0580e064886a
+# ╠═16d56fb2-b4ba-4bb2-9d9f-04910d339a41
+# ╠═8c91c608-e929-45c9-9f45-5c9e89de1317
+# ╠═7c745e4b-8263-4e1f-969e-9e1d64ef3278
+# ╠═863f1020-cbc9-41eb-b251-54ba20a8c718
+# ╠═ba0416bb-c88d-461b-a204-528476a7743b
+# ╠═ad5a72a9-f54f-43d8-887f-60384e0eb72f
+# ╠═c5c20310-9f64-438d-a246-2f0f06fafe92
+# ╟─a5b189a8-a5c7-4a69-a4a6-53fb256b1f76
+# ╠═4c938496-9204-4c15-8ffe-e6a8242f430b
+# ╠═6eba0cea-c34d-4905-b05b-55e8290ab6a7
+# ╟─10ed4dbe-5873-4091-9239-9b4c353e8783
+# ╠═9dcb799e-91e2-41f3-bb90-f5c0ee48add6
+# ╠═5711b475-6cf5-4c28-b4fe-87c40a92a881
+# ╠═c307baa6-eb57-4be8-b529-57be29344c9d
+# ╠═6e34c8c0-1b01-4425-b3bc-a52e94efb977
+# ╟─586cd0be-3bca-4338-a451-429cd6268414
+# ╠═a354eb0a-91ea-4cbe-8bfb-6e0338d987eb
+# ╠═edef31e2-ed59-4c67-a2fd-7ed2fe27834c
+# ╠═17c657dc-a2ad-4741-b75a-9b5f00526401
+# ╠═67941a28-6362-4735-a97a-c6484326c13d
+# ╠═3464bcbe-9588-4fc1-aa50-5e11d0d01051
+# ╠═4e1db290-43a8-4552-99f2-e44a1f7f2186
+# ╠═dde15418-4f60-47cb-853b-c048422ceb08
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
